@@ -194,7 +194,7 @@ const getChangedServices = async (client, prNumber) => {
 
 // most @actions toolkit packages have async methods
 async function run() {
-    try {
+    try { 
         const token = core.getInput('repo-token', { required: true });
         const client = github.getOctokit(token);
         const prNumber = getPrNumber();
