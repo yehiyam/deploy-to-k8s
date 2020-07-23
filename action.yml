@@ -1,0 +1,5 @@
+name: 'Deploy PR to k8s'
+description: 'deploys a pr branch to kubernetes using helm chart'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
