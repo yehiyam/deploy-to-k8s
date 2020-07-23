@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const regex = /^core\/(.+)\/.*$/gm;
+const regex = /^core\/(.+)\/.*$/;
 const getPrNumber = () => {
     const pullRequest = github.context.payload.pull_request;
     if (!pullRequest) {
@@ -19,20 +19,19 @@ const getChangedServices = async (client, prNumber) => {
     const changedFiles = listFilesResponse.data.map(f => f.filename);
 
     core.debug('found changed files:');
-    // const changedServices = new Set();
+    const changedServices = new Set();
     for (const file of changedFiles) {
-        core.debug('  ' + file);
         const match = file.match(regex);
-        core.debug('  ' + match);
-
+        if (match && match.length > 2) {
+            changedServices.add(match[1])
+        }
     }
-
-    return changedFiles;
+    return [...changedServices.keys()];
 }
 
 // most @actions toolkit packages have async methods
 async function run() {
-    try { 
+    try {
         const token = core.getInput('repo-token', { required: true });
         const client = github.getOctokit(token);
         const prNumber = getPrNumber();
@@ -40,7 +39,8 @@ async function run() {
             throw new Error('Could not get pull request number from context, exiting');
         }
         core.debug(`fetching changed services for pr #${prNumber}`);
-        await getChangedServices(client, prNumber);
+        const changedServices = await getChangedServices(client, prNumber);
+        core.info(`changed services: ${changedServices}`);
 
     } catch (error) {
         core.setFailed(error.message);
