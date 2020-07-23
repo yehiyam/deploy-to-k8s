@@ -1,6 +1,5 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const { promisify } = require('util');
 
 const getPrNumber = () => {
     const pullRequest = github.context.payload.pull_request;
@@ -20,7 +19,7 @@ const getChangedServices = async (client, prNumber) => {
     const changedFiles = listFilesResponse.data.map(f => f.filename);
 
     core.debug('found changed files:');
-    const changedServices = new Set();
+    // const changedServices = new Set();
     for (const file of changedFiles) {
         core.debug('  ' + file);
     }
@@ -38,7 +37,7 @@ async function run() {
             throw new Error('Could not get pull request number from context, exiting');
         }
         core.debug(`fetching changed services for pr #${prNumber}`);
-        const changed = await getChangedServices(client, prNumber);
+        await getChangedServices(client, prNumber);
 
     } catch (error) {
         core.setFailed(error.message);
