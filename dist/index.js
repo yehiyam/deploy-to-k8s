@@ -165,7 +165,7 @@ module.exports = require("os");
 
 const core = __webpack_require__(470);
 const github = __webpack_require__(469);
-
+const regex = /^core\/(.+)\/.*$/gm;
 const getPrNumber = () => {
     const pullRequest = github.context.payload.pull_request;
     if (!pullRequest) {
@@ -187,6 +187,9 @@ const getChangedServices = async (client, prNumber) => {
     // const changedServices = new Set();
     for (const file of changedFiles) {
         core.debug('  ' + file);
+        const match = file.match(regex);
+        core.debug('  ' + match);
+
     }
 
     return changedFiles;

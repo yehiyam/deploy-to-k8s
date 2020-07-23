@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-
+const regex = /^core\/(.+)\/.*$/gm;
 const getPrNumber = () => {
     const pullRequest = github.context.payload.pull_request;
     if (!pullRequest) {
@@ -22,6 +22,9 @@ const getChangedServices = async (client, prNumber) => {
     // const changedServices = new Set();
     for (const file of changedFiles) {
         core.debug('  ' + file);
+        const match = file.match(regex);
+        core.debug('  ' + match);
+
     }
 
     return changedFiles;
