@@ -3,3 +3,7 @@ description: 'deploys a pr branch to kubernetes using helm chart'
 runs:
   using: 'node12'
   main: 'dist/index.js'
+inputs: 
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+    required: true
