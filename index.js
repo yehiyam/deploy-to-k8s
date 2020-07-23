@@ -26,6 +26,7 @@ const getChangedServices = async (client, prNumber) => {
             changedServices.add(match[1])
         }
     }
+    core.debug(changedServices)
     return [...changedServices.keys()];
 }
 
