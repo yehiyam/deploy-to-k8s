@@ -161,11 +161,13 @@ module.exports = require("os");
 /***/ }),
 
 /***/ 104:
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
 const core = __webpack_require__(470);
 const github = __webpack_require__(469);
 const regex = /^core\/(.+)\/.*$/;
+
+
 const getPrNumber = () => {
     const pullRequest = github.context.payload.pull_request;
     if (!pullRequest) {
@@ -174,10 +176,9 @@ const getPrNumber = () => {
     return pullRequest.number;
 }
 
-const getChangedServices = async (client, prNumber) => {
+const getChangedServices = async (client, prNumber, repo) => {
     const listFilesResponse = await client.pulls.listFiles({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+        ...repo,
         pull_number: prNumber
     });
 
@@ -187,7 +188,8 @@ const getChangedServices = async (client, prNumber) => {
     const changedServices = new Set();
     for (const file of changedFiles) {
         const match = file.match(regex);
-        if (match && match.length > 2) {
+        core.debug(match);
+        if (match && match.length >= 2) {
             changedServices.add(match[1])
         }
     }
@@ -205,7 +207,10 @@ async function run() {
             throw new Error('Could not get pull request number from context, exiting');
         }
         core.debug(`fetching changed services for pr #${prNumber}`);
-        const changedServices = await getChangedServices(client, prNumber);
+        const changedServices = await getChangedServices(client, prNumber, {
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+        });
         core.info(`changed services: ${changedServices}`);
 
     } catch (error) {
@@ -214,6 +219,11 @@ async function run() {
 }
 
 run();
+
+
+module.exports = {
+    getChangedServices
+}
 
 /***/ }),
 
