@@ -31,7 +31,7 @@ const getChangedServices = async (client, prNumber) => {
 async function run() {
     try {
         const token = core.getInput('repo-token', { required: true });
-        const client = new github.GitHub(token);
+        const client = github.getOctokit(token);
         const prNumber = getPrNumber();
         if (!prNumber) {
             throw new Error('Could not get pull request number from context, exiting');
