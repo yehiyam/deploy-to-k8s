@@ -2,7 +2,7 @@ const process = require('process');
 const cp = require('child_process');
 const path = require('path');
 
-const { getChangedServices } = require('./index')
+const { getChangedServices, getBranchName } = require('./index')
 
 const clientMock = {
     pulls: {
@@ -25,4 +25,9 @@ xtest('test runs', () => {
 test('changed services', async () => {
     const res = await getChangedServices(clientMock, 0);
     expect(res).toHaveLength(2)
+})
+
+test('getBranchName', async () => {
+    const res = await getBranchName('refs/heads/feature-branch-1');
+    expect(res).toEqual('feature-branch-1')
 })
