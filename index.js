@@ -3,6 +3,7 @@ const github = require('@actions/github');
 const fs = require('fs-extra');
 const exec = require('@actions/exec');
 const path = require('path');
+const jsYaml = require('js-yaml');
 const regex = /^core\/(.+)\/.*$/;
 const regexBranchName = /^refs\/heads\/(.+)/;
 const workspace = process.env.GITHUB_WORKSPACE;
@@ -44,40 +45,44 @@ async function run() {
     try {
         core.debug(`workspace: ${workspace}`)
 
-        const token = core.getInput('repo-token', { required: true });
-        const client = github.getOctokit(token);
+        // const token = core.getInput('repo-token', { required: true });
+        // const client = github.getOctokit(token);
         const prNumber = getPrNumber();
         if (!prNumber) {
             throw new Error('Could not get pull request number from context, exiting');
         }
         core.debug(`fetching changed services for pr #${prNumber}`);
-        const changedServices = await getChangedServices(client, prNumber, {
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-        });
+        // const changedServices = await getChangedServices(client, prNumber, {
+        //     owner: github.context.repo.owner,
+        //     repo: github.context.repo.repo,
+        // });
+        const changedServices='worker';
         const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
-
+        const helmValuesFile = path.join(workspace,'helm','hkube','values.yaml');
+        const values = jsYaml.safeLoad(await fs.readFile(helmValuesFile));
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
             const packageJson = await fs.readJson(path.join(cwd, 'package.json'));
             const versionFromPackage = packageJson.version;
-            const version = `${versionFromPackage}-${branchName}-${github.context.runId}`
+            const version = `v${versionFromPackage}-${branchName}-${github.context.runId}`
             core.info(`building ${service} with version ${version}`);
             const env = {
                 ...process.env,
                 TRAVIS_PULL_REQUEST: 'true',
                 TRAVIS_PULL_REQUEST_BRANCH: branchName,
                 TRAVIS_JOB_NUMBER: `${github.context.runId}`,
-                // PRIVATE_REGISTRY:'docker.io/yehiyam'
+                PRIVATE_REGISTRY:'docker.io/yehiyam'
             }
             await exec.exec('npm', ['run', 'build'], {
                 cwd,
                 env
             });
-
+            const serviceNameHelm=service.replace('-','_');
+            values[serviceNameHelm].image.tag=version;
         }
+        await fs.writeFile(helmValuesFile,jsYaml.safeDump(values))
 
     } catch (error) {
         core.setFailed(error.message);
