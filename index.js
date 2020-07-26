@@ -4,21 +4,17 @@ const fs = require('fs-extra');
 const exec = require('@actions/exec');
 const path = require('path');
 const regex = /^core\/(.+)\/.*$/;
-const regexBranchName = /^refs\/heads\/(.+)/;
+
 const workspace = process.env.GITHUB_WORKSPACE;
 
 const getPrNumber = () => {
-    const pullRequest = github.context.payload.pull_request;
+    const pullRequest = github.context.payload.pull_request || core.getInput('prNumber');
     if (!pullRequest) {
         return undefined;
     }
-    return pullRequest.number;
+    return pullRequest.number || pullRequest;
 }
 
-const getBranchName = (ref) => {
-    const match = ref.match(regexBranchName);
-    return match && match.length >= 2 && match[1]
-}
 
 const getChangedServices = async (client, prNumber, repo) => {
     const listFilesResponse = await client.pulls.listFiles({
@@ -55,7 +51,7 @@ async function run() {
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
         });
-        const branchName = getBranchName(github.context.ref);
+        const branchName = process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
 
@@ -89,5 +85,4 @@ run();
 
 module.exports = {
     getChangedServices,
-    getBranchName
 }
