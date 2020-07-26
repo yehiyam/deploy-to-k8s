@@ -1119,7 +1119,7 @@ async function run() {
         core.info(`changed services: ${changedServices}`);
         for (const service of changedServices) {
             core.info(`building ${service}`);
-            await exec.exec('bash', ['-c', 'echo $PWD'], {
+            await exec.exec('npm', ['run', 'build'], {
                 cwd: path.join(workspace, 'core', service)
             });
 
