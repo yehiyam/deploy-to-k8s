@@ -56,11 +56,11 @@ async function run() {
         //     owner: github.context.repo.owner,
         //     repo: github.context.repo.repo,
         // });
-        const changedServices=['worker'];
+        const changedServices = ['worker'];
         const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
-        const helmValuesFile = path.join(workspace,'helm','hkube','values.yaml');
+        const helmValuesFile = path.join(workspace, '/', 'helm', 'hkube', 'values.yaml');
         const values = jsYaml.safeLoad(await fs.readFile(helmValuesFile));
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
@@ -73,16 +73,16 @@ async function run() {
                 TRAVIS_PULL_REQUEST: 'true',
                 TRAVIS_PULL_REQUEST_BRANCH: branchName,
                 TRAVIS_JOB_NUMBER: `${github.context.runId}`,
-                PRIVATE_REGISTRY:'docker.io/yehiyam'
+                PRIVATE_REGISTRY: 'docker.io/yehiyam'
             }
             await exec.exec('npm', ['run', 'build'], {
                 cwd,
                 env
             });
-            const serviceNameHelm=service.replace('-','_');
-            values[serviceNameHelm].image.tag=version;
+            const serviceNameHelm = service.replace('-', '_');
+            values[serviceNameHelm].image.tag = version;
         }
-        await fs.writeFile(helmValuesFile,jsYaml.safeDump(values))
+        await fs.writeFile(helmValuesFile, jsYaml.safeDump(values))
         core.setOutput('version', `v${branchName}-${github.context.runId}`)
 
     } catch (error) {
