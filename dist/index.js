@@ -1814,7 +1814,7 @@ async function run() {
         //     owner: github.context.repo.owner,
         //     repo: github.context.repo.repo,
         // });
-        const changedServices='worker';
+        const changedServices=['worker'];
         const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
