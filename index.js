@@ -65,6 +65,7 @@ async function run() {
             const version = `${versionFromPackage}-${branchName}-${github.context.runId}`
             core.info(`building ${service} with version ${version}`);
             const env = {
+                ...process.env,
                 TRAVIS_PULL_REQUEST: 'true',
                 TRAVIS_PULL_REQUEST_BRANCH: branchName,
                 TRAVIS_JOB_NUMBER: `${github.context.runId}`,
