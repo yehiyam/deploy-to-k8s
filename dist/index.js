@@ -1070,9 +1070,9 @@ module.exports = require("os");
 const core = __webpack_require__(470);
 const github = __webpack_require__(469);
 const exec = __webpack_require__(986);
-
+const path = __webpack_require__(622);
 const regex = /^core\/(.+)\/.*$/;
-const workspace=process.env.GITHUB_WORKSPACE;
+const workspace = process.env.GITHUB_WORKSPACE;
 
 const getPrNumber = () => {
     const pullRequest = github.context.payload.pull_request;
@@ -1119,7 +1119,9 @@ async function run() {
         core.info(`changed services: ${changedServices}`);
         for (const service of changedServices) {
             core.info(`building ${service}`);
-            await exec.exec('sh', ['-c','echo $PWD'], {cwd: 'workspace'});
+            await exec.exec('bash', ['-c', 'echo $PWD'], {
+                cwd: path.join(workspace, 'core', service)
+            });
 
         }
 
