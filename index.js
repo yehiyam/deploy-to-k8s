@@ -60,7 +60,7 @@ async function run() {
         const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
-        const helmValuesFile = path.join(workspace, '/', 'helm', 'hkube', 'values.yaml');
+        const helmValuesFile = path.join(workspace, 'helm', 'hkube', 'values.yaml');
         const values = jsYaml.safeLoad(await fs.readFile(helmValuesFile));
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
