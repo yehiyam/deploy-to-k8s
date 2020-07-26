@@ -7,3 +7,6 @@ inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
     required: true
+outputs:
+  version:
+    description: 'The new version to deploy'
