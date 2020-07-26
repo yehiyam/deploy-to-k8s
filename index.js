@@ -43,6 +43,7 @@ const getChangedServices = async (client, prNumber, repo) => {
 async function run() {
     try {
         core.debug(`workspace: ${workspace}`)
+        core.debug(process.env)
         const token = core.getInput('repo-token', { required: true });
         const client = github.getOctokit(token);
         const prNumber = getPrNumber();
