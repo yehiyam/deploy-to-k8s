@@ -7,6 +7,9 @@ inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
     required: true
+  prNumber:
+    description: 'The number of the PR'
+    required: false
 outputs:
   version:
     description: 'The new version to deploy'
