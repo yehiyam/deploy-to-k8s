@@ -4,17 +4,21 @@ const fs = require('fs-extra');
 const exec = require('@actions/exec');
 const path = require('path');
 const regex = /^core\/(.+)\/.*$/;
-
+const regexBranchName = /^refs\/heads\/(.+)/;
 const workspace = process.env.GITHUB_WORKSPACE;
 
 const getPrNumber = () => {
-    const pullRequest = github.context.payload.pull_request || core.getInput('prNumber');
+    const pullRequest = github.context.payload.pull_request;
     if (!pullRequest) {
-        return undefined;
+        return core.getInput('prNumber');
     }
-    return pullRequest.number || pullRequest;
+    return pullRequest.number;
 }
 
+const getBranchName = (ref) => {
+    const match = ref.match(regexBranchName);
+    return match && match.length >= 2 && match[1]
+}
 
 const getChangedServices = async (client, prNumber, repo) => {
     const listFilesResponse = await client.pulls.listFiles({
@@ -39,7 +43,7 @@ const getChangedServices = async (client, prNumber, repo) => {
 async function run() {
     try {
         core.debug(`workspace: ${workspace}`)
-        core.debug(process.env)
+
         const token = core.getInput('repo-token', { required: true });
         const client = github.getOctokit(token);
         const prNumber = getPrNumber();
@@ -51,14 +55,14 @@ async function run() {
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
         });
-        const branchName = process.env['GITHUB_HEAD_REF'];
+        const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
 
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
             const packageJson = await fs.readJson(path.join(cwd, 'package.json'));
-            const versionFromPackage=packageJson.version;
+            const versionFromPackage = packageJson.version;
             const version = `${versionFromPackage}-${branchName}-${github.context.runId}`
             core.info(`building ${service} with version ${version}`);
             const env = {
@@ -85,4 +89,5 @@ run();
 
 module.exports = {
     getChangedServices,
+    getBranchName
 }
