@@ -1776,8 +1776,16 @@ const getPrNumber = () => {
 }
 
 const getBranchName = (ref) => {
+    const branchNameInput = core.getInput('branchName');
+    if (branchNameInput){
+        return branchNameInput;
+    }
     const match = ref.match(regexBranchName);
-    return match && match.length >= 2 && match[1]
+    const branchNameFromRef = match && match.length >= 2 && match[1]
+    if (branchNameFromRef){
+        return branchNameFromRef;
+    }
+    return process.env['GITHUB_HEAD_REF'];
 }
 
 const getChangedServices = async (client, prNumber, repo) => {
@@ -1817,7 +1825,7 @@ async function run() {
         // });
         const changedServices = ['worker'];
         core.debug(`context: ${JSON.stringify(github.context)}, env: ${JSON.stringify(process.env)}`)
-        const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
+        const branchName = getBranchName(github.context.ref)
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
         const helmValuesFile = path.join(homedir(), 'helm', 'hkube', 'values.yaml');

@@ -10,6 +10,9 @@ inputs:
   prNumber:
     description: 'The number of the PR'
     required: false
+  branchName:
+    required: false
+    description: 'pr branch name'
 outputs:
   version:
     description: 'The new version to deploy'
