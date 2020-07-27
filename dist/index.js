@@ -1759,6 +1759,7 @@ module.exports = new Type('tag:yaml.org,2002:set', {
 const core = __webpack_require__(470);
 const github = __webpack_require__(469);
 const fs = __webpack_require__(226);
+const { homedir } = __webpack_require__(87);
 const exec = __webpack_require__(986);
 const path = __webpack_require__(622);
 const jsYaml = __webpack_require__(414);
@@ -1818,7 +1819,7 @@ async function run() {
         const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
-        const helmValuesFile = path.join(workspace, 'helm', 'hkube', 'values.yaml');
+        const helmValuesFile = path.join(homedir(), 'helm', 'hkube', 'values.yaml');
         const values = jsYaml.safeLoad(await fs.readFile(helmValuesFile));
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
