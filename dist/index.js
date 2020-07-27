@@ -1816,7 +1816,7 @@ async function run() {
         //     repo: github.context.repo.repo,
         // });
         const changedServices = ['worker'];
-        core.debug(`context: ${github.context}, env: ${process.env}`)
+        core.debug(`context: ${JSON.stringify(github.context)}, env: ${JSON.stringify(process.env)}`)
         const branchName = getBranchName(github.context.ref) || process.env['GITHUB_HEAD_REF'];
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
