@@ -93,7 +93,7 @@ async function run() {
             values[serviceNameHelm].image.tag = version;
         }
         await fs.writeFile(helmValuesFile, jsYaml.safeDump(values))
-        core.setOutput('version', `v${branchName}-${github.context.runId}`)
+        core.setOutput('version', `${values.systemversion}.${branchName}.${github.context.runId}`)
 
     } catch (error) {
         core.setFailed(error.message);
