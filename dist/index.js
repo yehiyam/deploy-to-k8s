@@ -1779,12 +1779,12 @@ const getPrNumber = () => {
 
 const getBranchName = (ref) => {
     const branchNameInput = core.getInput('branchName');
-    if (branchNameInput){
+    if (branchNameInput) {
         return branchNameInput;
     }
     const match = ref.match(regexBranchName);
     const branchNameFromRef = match && match.length >= 2 && match[1]
-    if (branchNameFromRef){
+    if (branchNameFromRef) {
         return branchNameFromRef;
     }
     return process.env['GITHUB_HEAD_REF'];
@@ -1830,7 +1830,7 @@ async function run() {
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
         const helmValuesFile = path.join(homedir(), 'helm', 'hkube', 'values.yaml');
-        const valuesObject = new YAWN(await fs.readFile(helmValuesFile))
+        const valuesObject = new YAWN(await fs.readFile(helmValuesFile, 'utf8'))
         const values = valuesObject.json;
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
@@ -1852,8 +1852,8 @@ async function run() {
             const serviceNameHelm = service.replace('-', '_');
             values[serviceNameHelm].image.tag = version;
         }
-        valuesObject.json=values
-        const newYaml=valuesObject.yaml;
+        valuesObject.json = values
+        const newYaml = valuesObject.yaml;
         await fs.writeFile(helmValuesFile, newYaml)
         core.setOutput('version', `${values.systemversion}-${branchName}.${github.context.runId}`)
 
