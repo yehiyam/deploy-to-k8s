@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const { homedir } = require('os');
 const exec = require('@actions/exec');
 const path = require('path');
-const jsYaml = require('js-yaml');
+const YAWN = require('yawn-yaml/cjs')
 const regex = /^core\/(.+)\/.*$/;
 const regexBranchName = /^refs\/heads\/(.+)/;
 const workspace = process.env.GITHUB_WORKSPACE;
@@ -54,24 +54,24 @@ async function run() {
     try {
         core.debug(`workspace: ${workspace}`)
 
-        // const token = core.getInput('repo-token', { required: true });
-        // const client = github.getOctokit(token);
+        const token = core.getInput('repo-token', { required: true });
+        const client = github.getOctokit(token);
         const prNumber = getPrNumber();
         if (!prNumber) {
             throw new Error('Could not get pull request number from context, exiting');
         }
         core.debug(`fetching changed services for pr #${prNumber}`);
-        // const changedServices = await getChangedServices(client, prNumber, {
-        //     owner: github.context.repo.owner,
-        //     repo: github.context.repo.repo,
-        // });
-        const changedServices = ['worker'];
+        const changedServices = await getChangedServices(client, prNumber, {
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+        });
         core.debug(`context: ${JSON.stringify(github.context)}, env: ${JSON.stringify(process.env)}`)
         const branchName = getBranchName(github.context.ref)
         core.info(`building branch ${branchName}`);
         core.info(`changed services: ${changedServices}`);
         const helmValuesFile = path.join(homedir(), 'helm', 'hkube', 'values.yaml');
-        const values = jsYaml.safeLoad(await fs.readFile(helmValuesFile));
+        const valuesObject = new YAWN(await fs.readFile(helmValuesFile))
+        const values = valuesObject.json;
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
             const packageJson = await fs.readJson(path.join(cwd, 'package.json'));
@@ -83,7 +83,7 @@ async function run() {
                 TRAVIS_PULL_REQUEST: 'true',
                 TRAVIS_PULL_REQUEST_BRANCH: branchName,
                 TRAVIS_JOB_NUMBER: `${github.context.runId}`,
-                PRIVATE_REGISTRY: 'docker.io/yehiyam'
+                PRIVATE_REGISTRY: 'docker.io/hkube'
             }
             await exec.exec('npm', ['run', 'build'], {
                 cwd,
@@ -92,7 +92,8 @@ async function run() {
             const serviceNameHelm = service.replace('-', '_');
             values[serviceNameHelm].image.tag = version;
         }
-        await fs.writeFile(helmValuesFile, jsYaml.safeDump(values))
+        valuesObject.json=values
+        await fs.writeFile(helmValuesFile, valuesObject.yaml)
         core.setOutput('version', `${values.systemversion}-${branchName}.${github.context.runId}`)
 
     } catch (error) {
