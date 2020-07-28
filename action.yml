@@ -1,8 +1,8 @@
 name: 'Deploy PR to k8s'
 description: 'deploys a pr branch to kubernetes using helm chart'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: docker
+  image: Dockerfile
 inputs: 
   repo-token:
     description: 'The GITHUB_TOKEN secret'
