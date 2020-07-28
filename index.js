@@ -85,6 +85,7 @@ async function run() {
                 TRAVIS_JOB_NUMBER: `${github.context.runId}`,
                 PRIVATE_REGISTRY: 'docker.io/hkube'
             }
+            await exec.exec('npm', ['ci'], { cwd });
             await exec.exec('npm', ['run', 'build'], {
                 cwd,
                 env
