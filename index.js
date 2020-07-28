@@ -5,7 +5,7 @@ const { homedir } = require('os');
 const exec = require('@actions/exec');
 const path = require('path');
 const YAWN = require('yawn-yaml/cjs')
-const regex = /^core\/(.+)\/.*$/;
+const regex = /^core\/([^/]+)\/.*$/;
 const regexBranchName = /^refs\/heads\/(.+)/;
 const workspace = process.env.GITHUB_WORKSPACE;
 

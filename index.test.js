@@ -10,6 +10,7 @@ const clientMock = {
             data: [
                 { filename: 'core/algorithm-queue/file1.js' },
                 { filename: 'core/algorithm-builder/file2.js' },
+                { filename: 'core/algorithm-builder/dockerfile/file2.js' },
                 { filename: 'file1.js' },
             ]
         })

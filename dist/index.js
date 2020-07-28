@@ -1765,7 +1765,7 @@ const { homedir } = __webpack_require__(87);
 const exec = __webpack_require__(986);
 const path = __webpack_require__(622);
 const YAWN = __webpack_require__(180)
-const regex = /^core\/(.+)\/.*$/;
+const regex = /^core\/([^/]+)\/.*$/;
 const regexBranchName = /^refs\/heads\/(.+)/;
 const workspace = process.env.GITHUB_WORKSPACE;
 
