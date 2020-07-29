@@ -1853,12 +1853,13 @@ async function run() {
             const serviceNameHelm = service.replace('-', '_');
             values[serviceNameHelm].image.tag = version;
         }
-        values.systemversion=`${values.systemversion}-${branchName.replace('_','-')}+${github.context.runId}`
+        const newVersion=`${values.systemversion}-${branchName.replace('_','-')}+${github.context.runId}`;
+        values.systemversion=newVersion;
         valuesObject.json = values
         const newYaml = valuesObject.yaml;
         await fs.writeFile(helmValuesFile, newYaml)
-        core.info(`created version ${values.systemversion}`);
-        core.setOutput('version', values.systemversion)
+        core.info(`created version ${newVersion}`);
+        core.setOutput('version', newVersion)
 
     } catch (error) {
         core.setFailed(error.message);
