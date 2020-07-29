@@ -72,6 +72,7 @@ async function run() {
         const helmValuesFile = path.join(homedir(), 'helm', 'hkube', 'values.yaml');
         const valuesObject = new YAWN(await fs.readFile(helmValuesFile, 'utf8'))
         const values = valuesObject.json;
+        const { version: hkubeVersion } = await fs.readJson(path.join('./', 'package.json'));
         for (const service of changedServices) {
             const cwd = path.join(workspace, 'core', service);
             const packageJson = await fs.readJson(path.join(cwd, 'package.json'));
@@ -93,8 +94,8 @@ async function run() {
             const serviceNameHelm = service.replace('-', '_');
             values[serviceNameHelm].image.tag = version;
         }
-        const newVersion=`${values.systemversion}-${branchName.replace('_','-')}+${github.context.runId}`;
-        values.systemversion=newVersion;
+        const newVersion = `${hkubeVersion}-${branchName.replace('_', '-')}+${github.context.runId}`;
+        values.systemversion = newVersion;
         valuesObject.json = values
         const newYaml = valuesObject.yaml;
         await fs.writeFile(helmValuesFile, newYaml)
