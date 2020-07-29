@@ -1854,7 +1854,7 @@ async function run() {
             const serviceNameHelm = service.replace('-', '_');
             values[serviceNameHelm].image.tag = version;
         }
-        const newVersion = `${hkubeVersion}-${branchName.replace('_', '-')}+${github.context.runId}`;
+        const newVersion = `${hkubeVersion}-${branchName.replace('_', '-')}.${github.context.runId}`;
         values.systemversion = newVersion;
         valuesObject.json = values
         const newYaml = valuesObject.yaml;
