@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const { homedir } = require('os');
 const exec = require('@actions/exec');
 const path = require('path');
-const YAWN = require('yawn-yaml/cjs')
+const YAWN = require('yawn-yaml/cjs');
 const regex = /^core\/([^/]+)\/.*$/;
 const regexBranchName = /^refs\/heads\/(.+)/;
 const workspace = process.env.GITHUB_WORKSPACE;
@@ -97,6 +97,7 @@ async function run() {
         valuesObject.json = values
         const newYaml = valuesObject.yaml;
         await fs.writeFile(helmValuesFile, newYaml)
+        core.info(`created version ${values.systemversion}`);
         core.setOutput('version', values.systemversion)
 
     } catch (error) {
