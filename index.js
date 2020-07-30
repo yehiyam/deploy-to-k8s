@@ -100,7 +100,7 @@ async function run() {
         const newYaml = valuesObject.yaml;
         await fs.writeFile(helmValuesFile, newYaml)
         core.info(`created version ${newVersion}`);
-        core.setOutput('version', newVersion)
+        core.setOutput('version', hkubeVersion)
 
     } catch (error) {
         core.setFailed(error.message);
