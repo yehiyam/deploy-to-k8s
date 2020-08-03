@@ -91,7 +91,7 @@ async function run() {
                 cwd,
                 env
             });
-            const serviceNameHelm = service.replace('/-/g', '_');
+            const serviceNameHelm = service.replace(/-/g, '_');
             values[serviceNameHelm].image.tag = version;
         }
         const newVersion = `${hkubeVersion}-${branchName.replace('_', '-')}.${github.context.runId}`;
