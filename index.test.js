@@ -5,6 +5,7 @@ const path = require('path');
 const { getChangedServices } = require('./index')
 
 const clientMock = {
+    paginate: (method)=>method().data,
     pulls: {
         listFiles: () => ({
             data: [

@@ -31,12 +31,12 @@ const getBranchName = (ref) => {
 }
 
 const getChangedServices = async (client, prNumber, repo) => {
-    const listFilesResponse = await client.pulls.listFiles({
+    const listFilesResponse = await client.paginate(client.pulls.listFiles,{
         ...repo,
         pull_number: prNumber
     });
 
-    const changedFiles = listFilesResponse.data.map(f => f.filename);
+    const changedFiles = listFilesResponse.map(f => f.filename);
 
     core.debug('found changed files:');
     const changedServices = new Set();
