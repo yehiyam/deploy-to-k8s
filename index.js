@@ -79,6 +79,11 @@ async function run() {
             const versionFromPackage = packageJson.version;
             const version = `v${versionFromPackage}-${branchName}-${github.context.runId}`
             core.info(`building ${service} with version ${version}`);
+            const serviceNameHelm = service.replace(/-/g, '_');
+            if (!values[serviceNameHelm]){
+                console.info(`skipping ${service}. Not in helm values`)
+                continue;
+            }
             const env = {
                 ...process.env,
                 TRAVIS_PULL_REQUEST: 'true',
@@ -91,7 +96,6 @@ async function run() {
                 cwd,
                 env
             });
-            const serviceNameHelm = service.replace(/-/g, '_');
             values[serviceNameHelm].image.tag = version;
         }
         const newVersion = `${hkubeVersion}-${branchName.replace('_', '-')}.${github.context.runId}`;
